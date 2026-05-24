@@ -1,0 +1,47 @@
+{% extends 'core/base.html' %}
+
+{% block content %}
+<div class="d-flex flex-column flex-md-row justify-content-between gap-3 mb-3">
+    <div>
+        <h1 class="mb-1">Направления подготовки</h1>
+        <p class="text-muted mb-0">Таблица с объединением одинаковых квалификаций.</p>
+    </div>
+    {% if user.is_staff %}
+        <a class="btn btn-primary align-self-start" href="{% url 'direction_create' %}">Добавить</a>
+    {% endif %}
+</div>
+
+<div class="table-responsive">
+    <table class="table table-bordered table-striped align-middle">
+        <thead class="table-primary">
+            <tr>
+                <th>Квалификация</th>
+                <th>Направление</th>
+                <th>Профиль</th>
+                {% if user.is_staff %}<th class="actions-col">Действия</th>{% endif %}
+            </tr>
+        </thead>
+        <tbody>
+            {% for row in rows %}
+                <tr>
+                    {% if row.show_qualification %}
+                        <td rowspan="{{ row.rowspan }}" class="fw-semibold">{{ row.direction.qualification }}</td>
+                    {% endif %}
+                    <td>{% if row.direction.code %}{{ row.direction.code }} - {% endif %}{{ row.direction.name }}</td>
+                    <td>{{ row.direction.profile }}</td>
+                    {% if user.is_staff %}
+                        <td class="text-nowrap">
+                            <a class="btn btn-sm btn-outline-primary" href="{% url 'direction_update' row.direction.pk %}">Изменить</a>
+                            <a class="btn btn-sm btn-outline-danger" href="{% url 'direction_delete' row.direction.pk %}">Удалить</a>
+                        </td>
+                    {% endif %}
+                </tr>
+            {% empty %}
+                <tr><td colspan="{% if user.is_staff %}4{% else %}3{% endif %}">Направления не найдены.</td></tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
+
+{% include 'core/pagination.html' %}
+{% endblock %}

@@ -1,0 +1,72 @@
+{% extends 'core/base.html' %}
+{% load static %}
+
+{% block content %}
+<div class="d-flex flex-column flex-md-row justify-content-between gap-3 mb-3">
+    <div>
+        <h1 class="mb-1">Преподаватели</h1>
+        <p class="text-muted mb-0">Карточки сотрудников кафедры с закрепленными направлениями подготовки.</p>
+    </div>
+    {% if user.is_staff %}
+        <a class="btn btn-primary align-self-start" href="{% url 'teacher_create' %}">Добавить</a>
+    {% endif %}
+</div>
+
+<form method="get" class="filters mb-4">
+    <div class="row g-2">
+        <div class="col-md-7">
+            <label class="form-label" for="q">Поиск</label>
+            <input class="form-control" id="q" name="q" type="search" value="{{ query }}" placeholder="ФИО, должность или звание">
+        </div>
+        <div class="col-md-3">
+            <label class="form-label" for="position">Должность</label>
+            <select class="form-select" id="position" name="position">
+                <option value="">Все должности</option>
+                {% for value, label in positions %}
+                    <option value="{{ value }}" {% if value == position %}selected{% endif %}>{{ label }}</option>
+                {% endfor %}
+            </select>
+        </div>
+        <div class="col-md-2 d-flex align-items-end">
+            <button class="btn btn-outline-primary w-100" type="submit">Найти</button>
+        </div>
+    </div>
+</form>
+
+<div class="teacher-grid">
+    {% for teacher in page_obj %}
+        <article class="teacher-card">
+            <img class="teacher-photo" src="{{ teacher.photo_url|default:'/static/core/teacher-placeholder.svg' }}" alt="Фото преподавателя {{ teacher.full_name }}">
+            <div class="teacher-body">
+                <h2 class="h5">{{ teacher.full_name }}</h2>
+                <p class="mb-1"><strong>{{ teacher.position }}</strong></p>
+                <p class="text-muted mb-2">{{ teacher.academic_title|default:'Звание не указано' }}</p>
+                
+                <!-- Добавьте эту строку для отображения количества дисциплин -->
+                <p class="small text-primary">
+                    <i class="bi bi-book"></i> Ведёт дисциплин: {{ teacher.subjects.count }}
+                </p>
+                <div class="directions-list">
+                    {% for direction in teacher.directions.all|slice:':3' %}
+                        <span>{{ direction.code }} {{ direction.profile }}</span>
+                    {% empty %}
+                        <span>Направления не назначены</span>
+                    {% endfor %}
+                </div>
+                {% if user.is_staff or user.is_authenticated and teacher.user_id == user.id %}
+                    <div class="card-actions mt-3">
+                        <a class="btn btn-sm btn-outline-primary" href="{% url 'teacher_update' teacher.pk %}">Редактировать</a>
+                        {% if user.is_staff %}
+                            <a class="btn btn-sm btn-outline-danger" href="{% url 'teacher_delete' teacher.pk %}">Удалить</a>
+                        {% endif %}
+                    </div>
+                {% endif %}
+            </div>
+        </article>
+    {% empty %}
+        <div class="alert alert-info">Преподаватели не найдены.</div>
+    {% endfor %}
+</div>
+
+{% include 'core/pagination.html' %}
+{% endblock %}

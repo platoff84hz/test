@@ -1,0 +1,6 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 640 480">
+  <rect width="640" height="480" fill="#eaf0f7"/>
+  <circle cx="320" cy="178" r="72" fill="#9bb3cf"/>
+  <path d="M176 408c22-84 80-126 144-126s122 42 144 126" fill="#9bb3cf"/>
+  <text x="320" y="455" text-anchor="middle" font-family="Arial, sans-serif" font-size="28" fill="#4d6685">Кафедра ИС</text>
+</svg>
